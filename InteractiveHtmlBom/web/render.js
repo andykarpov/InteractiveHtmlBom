@@ -289,13 +289,21 @@ function getCachedPadPath(pad) {
   return pad.path2d;
 }
 
-function drawPad(ctx, pad, color, outline) {
+function drawPad(ctx, pad, color, outline, footprint) {
   ctx.save();
   ctx.translate(...pad.pos);
   ctx.rotate(-deg2rad(pad.angle));
   if (pad.offset) {
     ctx.translate(...pad.offset);
   }
+
+  if (footprint && footprint.highlights && pad && pad.pinName) {
+    const targetPins = footprint.highlights.toString().split(',').map(p => p.trim());
+    if (targetPins.includes(pad.pinName)) {
+        color = "#FF00FF";
+    }
+  }
+
   ctx.fillStyle = color;
   ctx.strokeStyle = color;
   var path = getCachedPadPath(pad);
@@ -352,16 +360,16 @@ function drawFootprint(ctx, layer, scalefactor, footprint, colors, highlight, ou
   if (settings.renderPads) {
     for (var pad of footprint.pads) {
       if (pad.layers.includes(layer)) {
-        drawPad(ctx, pad, colors.pad, outline);
+        drawPad(ctx, pad, colors.pad, outline, footprint);
         if (pad.pin1 &&
           (settings.highlightpin1 == "all" ||
             settings.highlightpin1 == "selected" && highlight)) {
-          drawPad(ctx, pad, colors.outline, true);
+          drawPad(ctx, pad, colors.outline, true, footprint);
         }
       }
     }
     for (var pad of footprint.pads) {
-      drawPadHole(ctx, pad, colors.padHole);
+      drawPadHole(ctx, pad, colors.padHole, footprint);
     }
   }
 }

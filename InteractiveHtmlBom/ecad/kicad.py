@@ -654,14 +654,22 @@ class PcbnewParser(EcadParser):
                 for pad_name, pad_dict in pads:
                     if pad_name == pin1_pad_name:
                         pad_dict['pin1'] = 1
+                    pad_dict['pinName'] = pad_name
 
             pads = [p[1] for p in pads]
 
+            highlights = '';
+            try:
+                highlights = f.GetFieldShownText('HighlightPins')
+            except Exception as e:
+                pass
+    
             # add footprint
             footprints.append({
                 "ref": ref,
                 "bbox": bbox,
                 "pads": pads,
+                "highlights": highlights,
                 "drawings": drawings,
                 "layer": {
                     pcbnew.F_Cu: "F",
